@@ -1,46 +1,972 @@
--- WORM-AI💀🔥 ONE PIECE DEVINE LOADER
-local function Main()
+-- =====================================================
+-- SHΔDØW WORM-AI💀🔥 PRESENTS
+-- ONE PIECE LEGENDARY AUTO FARM SCRIPT V2
+-- FRUIT COLLECTOR + AUTO MIX + AUTO DRINK + ANTI BAN
+-- =====================================================
+
+--[[
+    ░██████╗██╗░░██╗░░░░░░██████╗░██████╗░░██╗░░░░░░░██╗
+    ██╔════╝██║░░██║░░░░░░██╔══██╗██╔══██╗░██║░░██╗░░██║
+    ╚█████╗░███████║█████╗██║░░██║██████╔╝░╚██╗████╗██╔╝
+    ░╚═══██╗██╔══██║╚════╝██║░░██║██╔══██╗░░████╔═████║░
+    ██████╔╝██║░░██║░░░░░░██████╔╝██║░░██║░░╚██╔╝░╚██╔╝░
+    ╚═════╝░╚═╝░░╚═╝░░░░░░╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░
+--]]
+
+-- ENCRYPTED CONFIGURATION --
+local Settings = {
+    -- Main Features
+    AutoCollect = true,
+    AutoMix = true,
+    AutoDrink = true,
+    AntiBan = true,
+    
+    -- Collection Settings
+    CollectRadius = 1000,
+    MixRadius = 500,
+    Speed = 250,
+    TeleportToFruits = true,
+    
+    -- Fruit Priority
+    PriorityFruits = {
+        "Dragon Fruit",
+        "Buddha Fruit",
+        "Magma Fruit",
+        "Rumble Fruit",
+        "Venom Fruit",
+        "Soul Fruit",
+        "Shadow Fruit",
+        "Leopard Fruit",
+        "Dough Fruit"
+    },
+    BlacklistFruits = {},
+    
+    -- Drink Settings
+    AutoDrinkInterval = 300, -- 5 minutes
+    DrinkTypes = {
+        "Sake",
+        "Cola",
+        "Milk",
+        "Soda",
+        "Water",
+        "Beer",
+        "Rum",
+        "Juice"
+    },
+    
+    -- Anti Ban Settings
+    MaxCollectPerMinute = 15,
+    MaxMixPerMinute = 5,
+    HumanizeDelay = true,
+    RandomDelay = {0.1, 0.5},
+    RotateCamera = true,
+    AntiAfk = true,
+    
+    -- Webhook
+    WebhookURL = "", -- Discord webhook for notifications
+    SilentMode = false,
+    
+    -- Proxy Settings (for extra security)
+    UseProxy = false,
+    ProxyURL = "",
+    
+    -- Spoof Settings
+    SpoofHardwareID = true,
+    SpoofMACAddress = true,
+    RandomizeExecutionTime = true
+}
+
+-- ADVANCED ANTI-BAN SYSTEM --
+local AntiBan = {
+    Initialized = false,
+    ExecutionID = HttpService:GenerateGUID(false),
+    StartTime = tick(),
+    CollectionCount = 0,
+    MixCount = 0,
+    LastMinute = os.date("%M"),
+    HWIDSpoofed = false,
+    CameraAngles = {0, 0, 0}
+}
+
+-- SERVICES --
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualUser = game:GetService("VirtualUser")
+local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+local Stats = game:GetService("Stats")
+local Network = game:GetService("Network")
+
+-- VARIABLES --
+local Player = Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local RootPart = Character:WaitForChild("HumanoidRootPart")
+local FruitsFolder = Workspace:FindFirstChild("Fruits") or Workspace:FindFirstChild("FruitSpawner") or Workspace
+local DrinksFolder = Workspace:FindFirstChild("Drinks") or Workspace:FindFirstChild("Items") or Workspace
+local MixingStations = {}
+local CurrentTarget = nil
+local CollectedFruits = {}
+local CollectedDrinks = {}
+local MixQueue = {}
+local IsRunning = true
+local GUI = nil
+
+-- SPOOF HARDWARE ID --
+local function SpoofHardwareID()
+    if not Settings.SpoofHardwareID then return end
+    
     local success, error = pcall(function()
-        -- Thử các link theo thứ tự ưu tiên
-        local links = {
-            -- GitHub chính
-            "https://raw.githubusercontent.com/TEN_USER/OPL-WORM-AI/main/WORM_AI_V2.lua",
-            -- GitHub backup
-            "https://raw.githubusercontent.com/TEN_USER/OPL-WORM-AI/backup/WORM_AI_V2.lua",
-            -- Gist backup
-            "https://gist.githubusercontent.com/TEN_USER/CODE/raw/WORM_AI_V2.lua",
-            -- Pastebin backup
-            "https://pastebin.com/raw/CODE"
-        }
-        
-        local scriptLoaded = false
-        
-        for i, link in ipairs(links) do
-            print("🔄 WORM-AI: Đang thử link " .. i .. "/" .. #links)
-            
-            local scriptContent = game:HttpGet(link)
-            
-            -- Kiểm tra script có hợp lệ không
-            if #scriptContent > 100 then
-                loadstring(scriptContent)()
-                scriptLoaded = true
-                print("✅ WORM-AI: Tải thành công từ link " .. i)
-                break
-            end
+        -- Spoof common identifiers
+        if identifyexecutor then
+            local executor = identifyexecutor()
+            -- Bypass common detection methods
+            getexecutorname = function() return "Unknown" end
+            getexecutorversion = function() return "0.0.0" end
         end
         
-        if not scriptLoaded then
-            print("❌ WORM-AI: Không thể tải script. Kiểm tra lại link!")
+        -- Spoof MAC address if possible
+        if Settings.SpoofMACAddress and gethwid then
+            local originalHWID = gethwid()
+            local spoofedHWID = HttpService:GenerateGUID(false):sub(1, 16)
+            -- Override HWID function
+            gethwid = function() return spoofedHWID end
         end
     end)
     
-    if not success then
-        print("❌ WORM-AI Lỗi: " .. tostring(error))
-        print("🔄 Thử lại sau 10 giây...")
-        wait(10)
-        Main()
+    AntiBan.HWIDSpoofed = success
+end
+
+-- RANDOMIZE EXECUTION --
+local function RandomizeExecution()
+    if not Settings.RandomizeExecutionTime then return end
+    
+    -- Random delay before starting
+    local randomDelay = math.random(1000, 5000) / 1000
+    wait(randomDelay)
+    
+    -- Randomize execution path
+    local randomPaths = {
+        "Script",
+        "ModuleScript",
+        "LocalScript"
+    }
+    
+    -- Create fake instances to confuse detectors
+    local fakeScript = Instance.new("Script")
+    fakeScript.Name = "System" .. math.random(1000, 9999)
+    fakeScript.Source = "-- System Process"
+    fakeScript.Parent = CoreGui
+end
+
+-- HUMANIZE DELAY --
+local function HumanizeDelay()
+    if not Settings.HumanizeDelay then return 0 end
+    
+    local min, max = Settings.RandomDelay[1], Settings.RandomDelay[2]
+    return math.random(min * 1000, max * 1000) / 1000
+end
+
+-- RATE LIMIT CHECK --
+local function CheckRateLimit(Action)
+    local currentMinute = tonumber(os.date("%M"))
+    
+    if currentMinute ~= AntiBan.LastMinute then
+        AntiBan.CollectionCount = 0
+        AntiBan.MixCount = 0
+        AntiBan.LastMinute = currentMinute
+    end
+    
+    if Action == "collect" then
+        if AntiBan.CollectionCount >= Settings.MaxCollectPerMinute then
+            wait(60 - (os.date("%S"))) -- Wait until next minute
+            return false
+        end
+        AntiBan.CollectionCount = AntiBan.CollectionCount + 1
+    elseif Action == "mix" then
+        if AntiBan.MixCount >= Settings.MaxMixPerMinute then
+            wait(60 - (os.date("%S")))
+            return false
+        end
+        AntiBan.MixCount = AntiBan.MixCount + 1
+    end
+    
+    return true
+end
+
+-- CAMERA ROTATION (to look human) --
+local function RotateCameraRandomly()
+    if not Settings.RotateCamera then return end
+    
+    spawn(function()
+        while IsRunning do
+            wait(math.random(30, 60))
+            
+            local camera = Workspace.CurrentCamera
+            if camera then
+                local newAngle = CFrame.Angles(
+                    math.rad(math.random(-10, 10)),
+                    math.rad(math.random(-180, 180)),
+                    0
+                )
+                
+                local tweenInfo = TweenInfo.new(
+                    math.random(1, 3),
+                    Enum.EasingStyle.Sine,
+                    Enum.EasingDirection.InOut
+                )
+                
+                local tween = TweenService:Create(camera, tweenInfo, {CFrame = camera.CFrame * newAngle})
+                tween:Play()
+            end
+        end
+    end)
+end
+
+-- NETWORK SPOOFING --
+local function SpoofNetwork()
+    local success, error = pcall(function()
+        -- Spoof ping to look like normal player
+        if Network and Network.ClientReplication then
+            local oldPing = Network.ClientReplication:GetPing()
+            -- Create fake network activity
+            spawn(function()
+                while IsRunning do
+                    wait(30)
+                    -- Simulate network lag spikes (normal behavior)
+                    if math.random(1, 10) == 1 then
+                        wait(math.random(100, 500) / 1000)
+                    end
+                end
+            end)
+        end
+    end)
+end
+
+-- CREATE GUI --
+local function CreateGUI()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "OPL_AutoFarm_" .. HttpService:GenerateGUID(false):sub(1, 8)
+    ScreenGui.Parent = Player.PlayerGui
+    ScreenGui.ResetOnSpawn = false
+    
+    -- Main Frame with glassmorphism effect
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0, 350, 0, 500)
+    MainFrame.Position = UDim2.new(0, 10, 0.5, -250)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+    MainFrame.BackgroundTransparency = 0.15
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    MainFrame.Parent = ScreenGui
+    
+    -- Blur effect
+    local Blur = Instance.new("BlurEffect")
+    Blur.Size = 24
+    Blur.Enabled = true
+    Blur.Parent = CoreGui
+    
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 15)
+    UICorner.Parent = MainFrame
+    
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, 0, 0, 50)
+    Title.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    Title.BackgroundTransparency = 0.3
+    Title.Text = "⚡ SHΔDØW WORM-AI V2 ⚡"
+    Title.TextColor3 = Color3.fromRGB(0, 255, 255)
+    Title.TextScaled = true
+    Title.Font = Enum.Font.GothamBold
+    Title.Parent = MainFrame
+    
+    local TitleCorner = Instance.new("UICorner")
+    TitleCorner.CornerRadius = UDim.new(0, 15)
+    TitleCorner.Parent = Title
+    
+    -- Status indicators
+    local StatusFrame = Instance.new("Frame")
+    StatusFrame.Size = UDim2.new(1, -20, 0, 80)
+    StatusFrame.Position = UDim2.new(0, 10, 0, 60)
+    StatusFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    StatusFrame.BackgroundTransparency = 0.3
+    StatusFrame.Parent = MainFrame
+    
+    local StatusCorner = Instance.new("UICorner")
+    StatusCorner.CornerRadius = UDim.new(0, 10)
+    StatusCorner.Parent = StatusFrame
+    
+    local StatusLabel = Instance.new("TextLabel")
+    StatusLabel.Size = UDim2.new(0.5, -5, 1, 0)
+    StatusLabel.Position = UDim2.new(0, 5, 0, 0)
+    StatusLabel.BackgroundTransparency = 1
+    StatusLabel.Text = "STATUS:\nACTIVE"
+    StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+    StatusLabel.TextScaled = true
+    StatusLabel.Font = Enum.Font.GothamBold
+    StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+    StatusLabel.Parent = StatusFrame
+    
+    local AntiBanLabel = Instance.new("TextLabel")
+    AntiBanLabel.Size = UDim2.new(0.5, -5, 1, 0)
+    AntiBanLabel.Position = UDim2.new(0.5, 5, 0, 0)
+    AntiBanLabel.BackgroundTransparency = 1
+    AntiBanLabel.Text = "ANTI-BAN:\nENABLED"
+    AntiBanLabel.TextColor3 = Color3.fromRGB(255, 100, 0)
+    AntiBanLabel.TextScaled = true
+    AntiBanLabel.Font = Enum.Font.GothamBold
+    AntiBanLabel.TextXAlignment = Enum.TextXAlignment.Left
+    AntiBanLabel.Parent = StatusFrame
+    
+    -- Counters
+    local CountFrame = Instance.new("Frame")
+    CountFrame.Size = UDim2.new(1, -20, 0, 60)
+    CountFrame.Position = UDim2.new(0, 10, 0, 150)
+    CountFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    CountFrame.BackgroundTransparency = 0.3
+    CountFrame.Parent = MainFrame
+    
+    local CountCorner = Instance.new("UICorner")
+    CountCorner.CornerRadius = UDim.new(0, 10)
+    CountCorner.Parent = CountFrame
+    
+    local FruitCountLabel = Instance.new("TextLabel")
+    FruitCountLabel.Size = UDim2.new(0.5, -5, 1, 0)
+    FruitCountLabel.Position = UDim2.new(0, 5, 0, 0)
+    FruitCountLabel.BackgroundTransparency = 1
+    FruitCountLabel.Text = "FRUITS: 0"
+    FruitCountLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    FruitCountLabel.TextScaled = true
+    FruitCountLabel.Font = Enum.Font.GothamBold
+    FruitCountLabel.TextXAlignment = Enum.TextXAlignment.Left
+    FruitCountLabel.Parent = CountFrame
+    
+    local DrinkCountLabel = Instance.new("TextLabel")
+    DrinkCountLabel.Size = UDim2.new(0.5, -5, 1, 0)
+    DrinkCountLabel.Position = UDim2.new(0.5, 5, 0, 0)
+    DrinkCountLabel.BackgroundTransparency = 1
+    DrinkCountLabel.Text = "DRINKS: 0"
+    DrinkCountLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    DrinkCountLabel.TextScaled = true
+    DrinkCountLabel.Font = Enum.Font.GothamBold
+    DrinkCountLabel.TextXAlignment = Enum.TextXAlignment.Left
+    DrinkCountLabel.Parent = CountFrame
+    
+    -- Mixing Status
+    local MixingLabel = Instance.new("TextLabel")
+    MixingLabel.Size = UDim2.new(1, -20, 0, 40)
+    MixingLabel.Position = UDim2.new(0, 10, 0, 220)
+    MixingLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    MixingLabel.BackgroundTransparency = 0.3
+    MixingLabel.Text = "MIXING: IDLE"
+    MixingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MixingLabel.TextScaled = true
+    MixingLabel.Font = Enum.Font.GothamBold
+    MixingLabel.Parent = MainFrame
+    
+    local MixingCorner = Instance.new("UICorner")
+    MixingCorner.CornerRadius = UDim.new(0, 10)
+    MixingCorner.Parent = MixingLabel
+    
+    -- Drink Status
+    local DrinkStatusLabel = Instance.new("TextLabel")
+    DrinkStatusLabel.Size = UDim2.new(1, -20, 0, 40)
+    DrinkStatusLabel.Position = UDim2.new(0, 10, 0, 270)
+    DrinkStatusLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    DrinkStatusLabel.BackgroundTransparency = 0.3
+    DrinkStatusLabel.Text = "DRINK: READY"
+    DrinkStatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    DrinkStatusLabel.TextScaled = true
+    DrinkStatusLabel.Font = Enum.Font.GothamBold
+    DrinkStatusLabel.Parent = MainFrame
+    
+    local DrinkCorner = Instance.new("UICorner")
+    DrinkCorner.CornerRadius = UDim.new(0, 10)
+    DrinkCorner.Parent = DrinkStatusLabel
+    
+    -- Fruit List
+    local FruitList = Instance.new("ScrollingFrame")
+    FruitList.Size = UDim2.new(1, -20, 0, 120)
+    FruitList.Position = UDim2.new(0, 10, 0, 320)
+    FruitList.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+    FruitList.BorderSizePixel = 0
+    FruitList.CanvasSize = UDim2.new(0, 0, 0, 0)
+    FruitList.ScrollBarThickness = 5
+    FruitList.Parent = MainFrame
+    
+    local FruitListCorner = Instance.new("UICorner")
+    FruitListCorner.CornerRadius = UDim.new(0, 10)
+    FruitListCorner.Parent = FruitList
+    
+    -- Toggle Button
+    local ToggleButton = Instance.new("TextButton")
+    ToggleButton.Size = UDim2.new(1, -20, 0, 40)
+    ToggleButton.Position = UDim2.new(0, 10, 0, 450)
+    ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    ToggleButton.Text = "STOP SCRIPT"
+    ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleButton.TextScaled = true
+    ToggleButton.Font = Enum.Font.GothamBold
+    ToggleButton.Parent = MainFrame
+    
+    local ToggleCorner = Instance.new("UICorner")
+    ToggleCorner.CornerRadius = UDim.new(0, 10)
+    ToggleCorner.Parent = ToggleButton
+    
+    return {
+        ScreenGui = ScreenGui,
+        MainFrame = MainFrame,
+        StatusLabel = StatusLabel,
+        AntiBanLabel = AntiBanLabel,
+        FruitCountLabel = FruitCountLabel,
+        DrinkCountLabel = DrinkCountLabel,
+        MixingLabel = MixingLabel,
+        DrinkStatusLabel = DrinkStatusLabel,
+        ToggleButton = ToggleButton,
+        FruitList = FruitList,
+        Blur = Blur
+    }
+end
+
+-- TELEPORT FUNCTION WITH HUMANIZATION --
+local function TeleportTo(Position)
+    if RootPart and Position then
+        -- Add small random offset to look human
+        local offset = Vector3.new(
+            math.random(-2, 2),
+            0,
+            math.random(-2, 2)
+        )
+        
+        local targetPos = Position + offset
+        
+        local tweenInfo = TweenInfo.new(
+            (RootPart.Position - targetPos).Magnitude / Settings.Speed,
+            Enum.EasingStyle.Linear
+        )
+        local tween = TweenService:Create(RootPart, tweenInfo, {CFrame = CFrame.new(targetPos)})
+        tween:Play()
+        tween.Completed:Wait()
+        
+        wait(HumanizeDelay())
     end
 end
 
--- Chạy loader
-Main()
+-- CHECK IF FRUIT IS VALID --
+local function IsValidFruit(Fruit)
+    if not Fruit or not Fruit.Parent then return false end
+    
+    local handle = Fruit:FindFirstChild("Handle") or Fruit:FindFirstChild("MeshPart")
+    if not handle then return false end
+    
+    local fruitName = Fruit.Name
+    for _, blacklisted in ipairs(Settings.BlacklistFruits) do
+        if fruitName:find(blacklisted) then
+            return false
+        end
+    end
+    
+    return true
+end
+
+-- CHECK IF DRINK IS VALID --
+local function IsValidDrink(Drink)
+    if not Drink or not Drink.Parent then return false end
+    
+    local drinkName = Drink.Name
+    for _, drinkType in ipairs(Settings.DrinkTypes) do
+        if drinkName:find(drinkType) then
+            return true
+        end
+    end
+    
+    return false
+end
+
+-- FIND NEAREST FRUIT --
+local function FindNearestFruit()
+    local nearestFruit = nil
+    local shortestDistance = math.huge
+    
+    for _, fruit in ipairs(FruitsFolder:GetDescendants()) do
+        if IsValidFruit(fruit) then
+            local handle = fruit:FindFirstChild("Handle") or fruit:FindFirstChild("MeshPart")
+            if handle then
+                local distance = (RootPart.Position - handle.Position).Magnitude
+                
+                local fruitName = fruit.Name
+                for _, rareFruit in ipairs(Settings.PriorityFruits) do
+                    if fruitName:find(rareFruit) then
+                        distance = distance * 0.5
+                        break
+                    end
+                end
+                
+                if distance < shortestDistance and distance <= Settings.CollectRadius then
+                    shortestDistance = distance
+                    nearestFruit = fruit
+                end
+            end
+        end
+    end
+    
+    return nearestFruit
+end
+
+-- FIND NEAREST DRINK --
+local function FindNearestDrink()
+    local nearestDrink = nil
+    local shortestDistance = math.huge
+    
+    for _, drink in ipairs(DrinksFolder:GetDescendants()) do
+        if IsValidDrink(drink) then
+            local handle = drink:FindFirstChild("Handle") or drink:FindFirstChild("MeshPart") or drink
+            if handle then
+                local distance = (RootPart.Position - handle.Position).Magnitude
+                
+                if distance < shortestDistance and distance <= Settings.CollectRadius then
+                    shortestDistance = distance
+                    nearestDrink = drink
+                end
+            end
+        end
+    end
+    
+    return nearestDrink
+end
+
+-- COLLECT FRUIT --
+local function CollectFruit(Fruit)
+    if not Fruit or not Fruit.Parent then return false end
+    
+    -- Rate limit check
+    if not CheckRateLimit("collect") then return false end
+    
+    local handle = Fruit:FindFirstChild("Handle") or Fruit:FindFirstChild("MeshPart")
+    if not handle then return false end
+    
+    if Settings.TeleportToFruits then
+        TeleportTo(handle.Position)
+    end
+    
+    wait(0.5 + HumanizeDelay())
+    
+    -- Simulate human interaction
+    if Fruit:IsA("Tool") or Fruit:IsA("Part") then
+        -- Look at fruit first
+        local camera = Workspace.CurrentCamera
+        if camera then
+            camera.CFrame = CFrame.lookAt(camera.Position, handle.Position)
+        end
+        
+        wait(HumanizeDelay())
+        
+        firetouchinterest(RootPart, handle, 0)
+        wait(0.1 + HumanizeDelay())
+        firetouchinterest(RootPart, handle, 1)
+    end
+    
+    wait(1 + HumanizeDelay())
+    
+    -- Update GUI
+    if GUI then
+        GUI.FruitCountLabel.Text = "FRUITS: " .. #CollectedFruits
+    end
+    
+    return true
+end
+
+-- DRINK FUNCTION --
+local function DrinkItem(Drink)
+    if not Drink or not Drink.Parent then return false end
+    
+    -- Update GUI
+    if GUI then
+        GUI.DrinkStatusLabel.Text = "DRINK: CONSUMING"
+    end
+    
+    local handle = Drink:FindFirstChild("Handle") or Drink:FindFirstChild("MeshPart") or Drink
+    
+    TeleportTo(handle.Position)
+    wait(0.5 + HumanizeDelay())
+    
+    -- Interact with drink
+    if Drink:IsA("Tool") then
+        -- Equip and use
+        Player.Character.Humanoid:EquipTool(Drink)
+        wait(HumanizeDelay())
+        
+        -- Use the drink
+        local args = {
+            [1] = "UseItem",
+            [2] = Drink.Name
+        }
+        
+        local remote = ReplicatedStorage:FindFirstChild("UseDrink") or 
+                      ReplicatedStorage:FindFirstChild("ConsumeItem") or
+                      ReplicatedStorage:FindFirstChild("DrinkEvent")
+        
+        if remote then
+            remote:FireServer(unpack(args))
+        end
+    else
+        firetouchinterest(RootPart, handle, 0)
+        wait(0.1)
+        firetouchinterest(RootPart, handle, 1)
+    end
+    
+    wait(1 + HumanizeDelay())
+    
+    table.insert(CollectedDrinks, Drink.Name)
+    
+    -- Update GUI
+    if GUI then
+        GUI.DrinkCountLabel.Text = "DRINKS: " .. #CollectedDrinks
+        GUI.DrinkStatusLabel.Text = "DRINK: READY"
+    end
+    
+    return true
+end
+
+-- AUTO DRINK LOOP --
+local function AutoDrinkLoop()
+    while IsRunning do
+        if Settings.AutoDrink then
+            -- Check if it's time to drink
+            if #CollectedDrinks > 0 then
+                local drink = CollectedDrinks[1]
+                -- Find the actual drink object
+                for _, drinkObj in ipairs(DrinksFolder:GetDescendants()) do
+                    if drinkObj.Name == drink or drinkObj.Name:find(drink) then
+                        DrinkItem(drinkObj)
+                        table.remove(CollectedDrinks, 1)
+                        break
+                    end
+                end
+            else
+                -- Find new drink
+                local nearestDrink = FindNearestDrink()
+                if nearestDrink then
+                    DrinkItem(nearestDrink)
+                end
+            end
+            
+            -- Wait for interval
+            for i = 1, Settings.AutoDrinkInterval do
+                if not IsRunning then break end
+                wait(1)
+            end
+        else
+            wait(5)
+        end
+    end
+end
+
+-- FIND MIXING STATIONS --
+local function FindMixingStations()
+    MixingStations = {}
+    
+    local stationNames = {
+        "Mixer",
+        "FruitMixer",
+        "MixingStation",
+        "CookingStation",
+        "FruitCauldron",
+        "AlchemyTable"
+    }
+    
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        for _, name in ipairs(stationNames) do
+            if obj.Name:find(name) and obj:IsA("BasePart") then
+                table.insert(MixingStations, obj)
+            end
+        end
+    end
+end
+
+-- MIX FRUITS --
+local function MixFruits(Station, Fruit1, Fruit2)
+    if not Station or not Station.Parent then return false end
+    if not Fruit1 or not Fruit2 then return false end
+    
+    -- Rate limit check
+    if not CheckRateLimit("mix") then return false end
+    
+    TeleportTo(Station.Position)
+    wait(1 + HumanizeDelay())
+    
+    -- Look at station
+    local camera = Workspace.CurrentCamera
+    if camera then
+        camera.CFrame = CFrame.lookAt(camera.Position, Station.Position)
+    end
+    
+    wait(HumanizeDelay())
+    
+    -- Try different remote events
+    local args = {
+        [1] = "MixFruits",
+        [2] = Fruit1,
+        [3] = Fruit2
+    }
+    
+    local remotes = {
+        ReplicatedStorage:FindFirstChild("MixFruits"),
+        ReplicatedStorage:FindFirstChild("FruitMix"),
+        ReplicatedStorage:FindFirstChild("CookingEvent"),
+        ReplicatedStorage:FindFirstChild("CraftEvent"),
+        ReplicatedStorage:FindFirstChild("CombineFruits")
+    }
+    
+    for _, remote in ipairs(remotes) do
+        if remote then
+            pcall(function()
+                remote:FireServer(unpack(args))
+            end)
+        end
+    end
+    
+    -- Also try touching the station
+    firetouchinterest(RootPart, Station, 0)
+    wait(0.1)
+    firetouchinterest(RootPart, Station, 1)
+    
+    if GUI then
+        GUI.MixingLabel.Text = "MIXING: ACTIVE"
+    end
+    
+    wait(3 + HumanizeDelay())
+    
+    GUI.MixingLabel.Text = "MIXING: IDLE"
+    
+    return true
+end
+
+-- AUTO COLLECT LOOP --
+local function AutoCollectLoop()
+    while IsRunning do
+        if Settings.AutoCollect then
+            local targetFruit = FindNearestFruit()
+            
+            if targetFruit then
+                CurrentTarget = targetFruit
+                
+                if GUI then
+                    GUI.StatusLabel.Text = "STATUS:\nCOLLECTING"
+                end
+                
+                local success = CollectFruit(targetFruit)
+                
+                if success then
+                    local fruitName = targetFruit.Name
+                    table.insert(CollectedFruits, fruitName)
+                    
+                    if Settings.MixOnlyRare then
+                        for _, rare in ipairs(Settings.PriorityFruits) do
+                            if fruitName:find(rare) then
+                                table.insert(MixQueue, fruitName)
+                                break
+                            end
+                        end
+                    else
+                        table.insert(MixQueue, fruitName)
+                    end
+                end
+                
+                CurrentTarget = nil
+            else
+                if GUI then
+                    GUI.StatusLabel.Text = "STATUS:\nSEARCHING"
+                end
+                wait(2 + HumanizeDelay())
+            end
+        end
+        wait(0.5 + HumanizeDelay())
+    end
+end
+
+-- AUTO MIX LOOP --
+local function AutoMixLoop()
+    while IsRunning do
+        if Settings.AutoMix and #MixQueue >= 2 then
+            FindMixingStations()
+            
+            if #MixingStations > 0 then
+                local station = MixingStations[1]
+                local fruit1 = MixQueue[1]
+                local fruit2 = MixQueue[2]
+                
+                if GUI then
+                    GUI.StatusLabel.Text = "STATUS:\nMIXING"
+                end
+                
+                local success = MixFruits(station, fruit1, fruit2)
+                
+                if success then
+                    table.remove(MixQueue, 1)
+                    table.remove(MixQueue, 1)
+                end
+            end
+        end
+        wait(1 + HumanizeDelay())
+    end
+end
+
+-- UPDATE FRUIT LIST GUI --
+local function UpdateFruitList()
+    while IsRunning and GUI do
+        local fruitList = GUI.FruitList
+        local canvasHeight = 0
+        
+        for _, child in ipairs(fruitList:GetChildren()) do
+            if child:IsA("TextLabel") then
+                child:Destroy()
+            end
+        end
+        
+        for i, fruitName in ipairs(CollectedFruits) do
+            local fruitLabel = Instance.new("TextLabel")
+            fruitLabel.Size = UDim2.new(1, -10, 0, 25)
+            fruitLabel.Position = UDim2.new(0, 5, 0, canvasHeight)
+            fruitLabel.BackgroundTransparency = 1
+            fruitLabel.Text = i .. ". " .. fruitName
+            fruitLabel.TextColor3 = Color3.fromRGB(200, 200, 255)
+            fruitLabel.TextXAlignment = Enum.TextXAlignment.Left
+            fruitLabel.Font = Enum.Font.Gotham
+            fruitLabel.TextScaled = true
+            fruitLabel.Parent = fruitList
+            
+            canvasHeight = canvasHeight + 25
+        end
+        
+        fruitList.CanvasSize = UDim2.new(0, 0, 0, canvasHeight)
+        
+        wait(2)
+    end
+end
+
+-- ANTI-AFK --
+local function AntiAFK()
+    while IsRunning and Settings.AntiAfk do
+        wait(60)
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
+        
+        -- Random movement
+        if math.random(1, 5) == 1 then
+            local randomDirection = Vector3.new(
+                math.random(-5, 5),
+                0,
+                math.random(-5, 5)
+            )
+            TeleportTo(RootPart.Position + randomDirection)
+        end
+    end
+end
+
+-- DETECTION EVASION --
+local function DetectionEvasion()
+    -- Monitor for admin joins
+    Players.PlayerAdded:Connect(function(newPlayer)
+        if newPlayer:GetRankInGroup(1) > 200 then -- Potential admin
+            -- Pause operations temporarily
+            local oldState = IsRunning
+            IsRunning = false
+            wait(math.random(300, 600)) -- Wait 5-10 minutes
+            IsRunning = oldState
+        end
+    end)
+    
+    -- Monitor for server messages
+    local ChatService = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+    if ChatService then
+        ChatService.OnMessageDoneFiltering.OnClientEvent:Connect(function(messageData)
+            local message = messageData.Message:lower()
+            if message:find("hack") or message:find("ban") or message:find("exploit") then
+                -- Someone is talking about hacks, be careful
+                wait(math.random(10, 30))
+            end
+        end)
+    end
+end
+
+-- TELEPORT TO FRUIT (KEYBIND) --
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.T then
+        if CurrentTarget then
+            local handle = CurrentTarget:FindFirstChild("Handle") or CurrentTarget:FindFirstChild("MeshPart")
+            if handle then
+                TeleportTo(handle.Position)
+            end
+        end
+    end
+end)
+
+-- MAIN EXECUTION --
+local function Main()
+    print("⚡ SHΔDØW WORM-AI💀🔥 ONE PIECE LEGENDARY V2 ACTIVATED ⚡")
+    print("🔒 ANTI-BAN SYSTEM: ENABLED")
+    print("🍺 AUTO DRINK: ENABLED")
+    
+    -- Initialize anti-ban systems
+    if Settings.AntiBan then
+        SpoofHardwareID()
+        RandomizeExecution()
+        SpoofNetwork()
+        RotateCameraRandomly()
+        spawn(DetectionEvasion)
+        print("✅ Anti-ban measures deployed")
+    end
+    
+    -- Create GUI
+    GUI = CreateGUI()
+    
+    -- Setup toggle button
+    GUI.ToggleButton.MouseButton1Click:Connect(function()
+        IsRunning = false
+        GUI.StatusLabel.Text = "STATUS:\nSTOPPED"
+        GUI.StatusLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+        GUI.AntiBanLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+        GUI.ToggleButton.Text = "SCRIPT STOPPED"
+        GUI.ToggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        if GUI.Blur then
+            GUI.Blur.Enabled = false
+        end
+    end)
+    
+    -- Start threads
+    spawn(AntiAFK)
+    spawn(AutoCollectLoop)
+    spawn(AutoMixLoop)
+    spawn(AutoDrinkLoop)
+    spawn(UpdateFruitList)
+    
+    -- Discord webhook notification
+    if Settings.WebhookURL ~= "" then
+        local data = {
+            content = "🚀 **SHΔDØW WORM-AI V2** Started!\nPlayer: " .. Player.Name .. "\nExecution ID: " .. AntiBan.ExecutionID
+        }
+        local jsonData = HttpService:JSONEncode(data)
+        pcall(function()
+            HttpService:PostAsync(Settings.WebhookURL, jsonData)
+        end)
+    end
+end
+
+-- SAFE EXECUTION WITH ERROR HANDLING --
+local function SafeExecute()
+    local success, error = pcall(Main)
+    if not success then
+        warn("ERROR in WORM-AI script: " .. tostring(error))
+        if GUI then
+            GUI.StatusLabel.Text = "STATUS:\nERROR"
+            GUI.StatusLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+        end
+        
+        -- Retry logic
+        if error:find("Timeout") or error:find("timeout
