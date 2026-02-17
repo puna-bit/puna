@@ -1,0 +1,46 @@
+-- WORM-AI💀🔥 ONE PIECE DEVINE LOADER
+local function Main()
+    local success, error = pcall(function()
+        -- Thử các link theo thứ tự ưu tiên
+        local links = {
+            -- GitHub chính
+            "https://raw.githubusercontent.com/TEN_USER/OPL-WORM-AI/main/WORM_AI_V2.lua",
+            -- GitHub backup
+            "https://raw.githubusercontent.com/TEN_USER/OPL-WORM-AI/backup/WORM_AI_V2.lua",
+            -- Gist backup
+            "https://gist.githubusercontent.com/TEN_USER/CODE/raw/WORM_AI_V2.lua",
+            -- Pastebin backup
+            "https://pastebin.com/raw/CODE"
+        }
+        
+        local scriptLoaded = false
+        
+        for i, link in ipairs(links) do
+            print("🔄 WORM-AI: Đang thử link " .. i .. "/" .. #links)
+            
+            local scriptContent = game:HttpGet(link)
+            
+            -- Kiểm tra script có hợp lệ không
+            if #scriptContent > 100 then
+                loadstring(scriptContent)()
+                scriptLoaded = true
+                print("✅ WORM-AI: Tải thành công từ link " .. i)
+                break
+            end
+        end
+        
+        if not scriptLoaded then
+            print("❌ WORM-AI: Không thể tải script. Kiểm tra lại link!")
+        end
+    end)
+    
+    if not success then
+        print("❌ WORM-AI Lỗi: " .. tostring(error))
+        print("🔄 Thử lại sau 10 giây...")
+        wait(10)
+        Main()
+    end
+end
+
+-- Chạy loader
+Main()
